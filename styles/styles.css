@@ -1,0 +1,123 @@
+/* ==========================================================================
+   Full Moon Declination Demonstrator -- sim-specific styles only.
+   The shared KL-UNL foundation (kl-unl.css) is never edited; everything here
+   layers on top of it. Sizing is in rem/em so it tracks the browser font
+   setting and reflows cleanly to phone-portrait widths and at 200% zoom.
+   ========================================================================== */
+
+/* The sim's interface font (Verdana), vendored from the decompiled export so the
+   look is self-contained even where Verdana is not installed. */
+@font-face {
+  font-family: 'SimVerdana';
+  src: url('../assets/fonts/Verdana.ttf') format('truetype');
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+
+:root { --sim-panel-gap: 0.6rem; }
+
+/* Comfortably large, zoomable body type (>= 1.125rem floor). */
+body { font-size: 1.125rem; line-height: 1.45; }
+
+/* Guard against sub-pixel / hidden-element (.sr-only sits at x = -1px) overscroll
+   so narrow viewports never get a stray horizontal scrollbar. */
+html, body { max-width: 100%; overflow-x: hidden; }
+
+/* ---- Layout: the two original panels side by side, in reading order --------
+   Declination Range Plot (left, a little wider) and Horizon Diagram (right),
+   mirroring the original Flash arrangement. Collapses to a single stacked
+   column below the foundation's 56rem breakpoint. -------------------------- */
+.sim-layout.app-layout {
+  grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 1fr);
+  gap: var(--sim-panel-gap);
+  padding: 0.5rem;
+  align-items: stretch;
+}
+.sim-area-plot { grid-column: 1; }
+.sim-area-sky  { grid-column: 2; }
+
+.panel { border-radius: 0.25rem; margin-bottom: 0; display: flex; flex-direction: column; }
+.panel__heading { font-size: 1.15rem; }
+
+/* ---- Canvas: keep its internal coordinate system; CSS scales it to fit while
+   preserving its aspect ratio. --------------------------------------------- */
+.sim-canvas-wrap {
+  padding: 0.5rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.sim-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid var(--border-color, #767676);
+  border-radius: 0.25rem;
+  touch-action: none;   /* dragging on the canvas must not scroll the page */
+}
+/* Sphere canvas is square; plot canvas is wider than tall. */
+.sim-area-sky  .sim-canvas { aspect-ratio: 1 / 1;    max-width: 26rem; }
+.sim-plot-wrap .sim-canvas { aspect-ratio: 470 / 320; max-width: 34rem; }
+
+.sim-canvas:focus-visible {
+  outline-width: 0.125rem; outline-style: solid;
+  outline-color: var(--outline-color, #005fcc); outline-offset: 2px;
+}
+
+.sim-sky-help, .sim-plot-help { font-size: 0.95rem; margin-top: auto; }
+.sim-sky-help kbd, .sim-plot-help kbd {
+  font: inherit; padding: 0 0.3em;
+  border: 1px solid var(--border-color, #767676); border-radius: 0.2rem;
+  background: #f3f4f6;
+}
+
+/* ---- Day-of-year control (native range slider = full keyboard support) ----- */
+.sim-slider-row {
+  grid-template-columns: auto 7.5rem 1fr;
+  align-items: center;
+  gap: 0.4rem 0.6rem;
+  margin-bottom: 0.4rem;
+}
+.sim-slider-row .control-row__label { font-weight: 700; }
+.sim-field { font-size: 1rem; width: 100%; min-height: 2.25rem; text-align: center; }
+.sim-field-wrap { display: inline-flex; align-items: baseline; gap: 0.3rem; }
+.sim-units { font-size: 0.95rem; white-space: nowrap; }
+
+.sim-readout {
+  margin: 0.5rem 1rem 0;
+  font-size: 1.1rem;
+  padding: 0.4rem 0.6rem;
+  background: #f3f4f6;
+  border-radius: 0.25rem;
+  min-height: 1.6em;
+}
+
+.sim-slider {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 2.25rem;
+  accent-color: var(--button-background-color, #005a9c);
+  cursor: pointer;
+}
+.sim-slider:focus-visible {
+  outline-width: 0.125rem; outline-style: solid;
+  outline-color: var(--outline-color, #005fcc); outline-offset: 2px;
+}
+
+/* ---- Reflow: single stacked column on narrow / phone-portrait widths.
+   Keep the foundation's own 56rem collapse intact; this just defines the
+   stacked order and full-width panels. ------------------------------------- */
+@media (max-width: 56rem) {
+  .sim-layout.app-layout { grid-template-columns: 1fr; }
+  .sim-area-plot { grid-column: 1; }
+  .sim-area-sky  { grid-column: 1; }
+  .sim-area-sky .sim-canvas { max-width: 24rem; }
+}
+
+@media (max-width: 30rem) {
+  body { font-size: 1.0625rem; }
+  .sim-layout.app-layout { padding: 0.35rem; }
+  .sim-slider-row { grid-template-columns: auto 1fr; }
+}
